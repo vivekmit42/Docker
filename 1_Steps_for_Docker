@@ -1,0 +1,43 @@
+sudo apt-get install docker docker.io -y
+systemctl status docker
+ls -l /etc/hosts
+hostname -I | awk '{print $1}'
+sudo vim /etc/hosts
+sudo cat /etc/hosts
+sudo apt-get install selinux -y
+sudo apt-get install selinux-basics 
+sudo vim /etc/selinux/config 
+reboot
+getenforce
+docker pull registry
+docker images
+mkdir ~/data/registry
+sudo mkdir ~/data/registry
+cd /
+sudo mkdir -p /data/registry
+ls -ld /data/registry
+docker run -d -p 5000:5000 -v /data/registry:/var/lib/registry --restart always --name registry registry
+docker ps -a --format "{{.Names}}:{{.Ports}}:{{.Status}}"
+docker pull nginx
+docker images
+docker run -d --name proxy -p 80:80 --restart always nginx
+docker ps -a --format "{{.Names}}:{{.Ports}}:{{.Status}}"
+hostname
+sudo hostname registry
+hostname
+cd ~
+sudo vim nginx.conf
+hostname
+htpasswd
+sudo apt-get install apache2-utils 
+htpasswd
+docker exec proxy apt-get update 
+docker exec proxy apt-get install apache2-utils
+docker exec proxy apt-get install apache2-utils -yq
+docker exec proxy which htpasswd
+docker exec proxy htpasswd -c -b /etc/nginx/htpasswd admin abc123
+sudo vim nginx.conf
+docker cp nginx.conf proxy:/etc/nginx/nginx.conf
+docker exec proxy nginx -t
+docker exec proxy /etc/init.d/nginx restart
+sudo cat /etc/hosts

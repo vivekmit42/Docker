@@ -1,0 +1,11 @@
+docker login registry.local.in
+docker pull couchbase
+docker tag couchbase:latest registry.local.in/couchbase-latest:latest
+docker images
+docker push registry.local.in/couchbase-latest:latest
+docker images
+docker pull node
+docker tag node:latest registry.local.in/node-latest:latest
+docker push registry.local.in/node-latest
+docker images
+

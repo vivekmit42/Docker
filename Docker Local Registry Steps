@@ -1,0 +1,118 @@
+Follow the link to create Docker Local Registry
+https://www.youtube.com/watch?v=9P_bYjPe6rA
+
+Here are the steps:
+
+In this video, you will learn to Setup a Private Docker registry on your server.
+We can set up it in three ways
+⌨️ (05:00) Insecure 
+⌨️ (23:50) Secure
+⌨️ (41:53) Authentication Based
+
+What is the Private Docker registry?
+Docker registry is a private repository just like docker-hub but it lives in your data center so that images in the registry can be accessed by only your company.
+We need to set up the registry in your local to push-pull images.
+We can use the same commands which we used for docker hub, the difference is you need to add your repo address to login & push
+
+example:
+docker login (repo addr)
+docker tag (image id/name) repoaddr/loginid/reponame:tag
+docker push repoaddr/loginid/reponame:tag
+
+(if we have noticed by default always docker repository is docker.io, so in case of our private registry we need to specify our repository as well)
+
+#dockerregistry #dockertrustedregistry #dtr #container #dockerimages
+
+Ref: https://docs.docker.com/registry/depl...
+---------------------------------------------
+Commands for setup:
+1. Insecure Registry
+$ docker run -itd -p 5000:5000 \
+  --name insecure_registry \
+  -v registry_storage:/var/lib/registry \
+  registry
+http://ipaddress:5000/v2/_catalog (for viewing repo)
+$ docker image tag (image) 127.0.0.1:5000/(image)
+$ docker image push 127.0.0.1:5000/(image)
+# Allows all 127.0.0.0/8 subnet
+$ifconfig
+# get server ip addr
+$docker tag (image) (server ip addr):5000/(image)
+$docker push (server ip addr):5000/(image)
+(push failed)
+# create daemon.json
+{
+ "insecure-registries": ["(server ip):5000"]
+}
+$mv daemon.json /etc/docker
+$sudo service docker restart
+$docker start insecure_registry
+$docker push (server ip addr):5000/(image)
+# success
+======================
+2. Secure Registry
+$cd /etc/docker
+$rm -f daemon.json
+$docker stop insecure_registry
+$sudo service docker restart
+# create certificates
+$cd ~
+$mkdir certs
+$sudo openssl req \
+  -newkey rsa:4096 -nodes -sha256 -keyout certs/domain.key \
+  -x509 -days 365 -out certs/domain.crt
+# Common Name: our.company.registry
+# download domain.crt file if you want other server to access it
+$cd /etc/docker 
+$mkdir certs.d
+$cd certs.d
+$mkdir our.company.registry:5000
+$ cd ~
+$cp certs/domain.crt \
+/etc/docker/certs.d/our.company.registry\:5000/ca.crt
+$sudo service docker restart
+$docker run -d \
+  --name secure_registry \
+  -v registry_storage:/var/lib/registry \
+  -v "$(pwd)"/certs:/certs \
+  -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
+  -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
+  -p 5000:5000 \
+  registry
+$docker push (server ip):5000/(image)
+# (failure)
+$docker image tag (image) our.company.registry:5000/(image)
+$docker push our.company.registry:5000/(image)
+(ErrorL no such host our.company.registry)
+$sudo vi /etc/hosts
+(registry server ip)  our.company.registry
+$docker push our.company.registry:5000/(image)
+# success
+======================
+3.Authentication Based
+$docker stop secure_registry
+$mkdir auth
+$docker container run --entrypoint htpasswd registry:2.7.0 -bnB suraj password (greater than symbol)auth/htpasswd
+# entrypoint is htpasswd, -b means run in bash mode, 
+# n means output must get displayed,B is bcrypt, username:suraj, password: password
+$ docker run -d -p 5000:5000 \
+--name auth_registry \
+-v registry_storage:/var/lib/registry \
+-v "$(pwd)"/auth:/auth \
+-v "$(pwd)"/certs:/certs \
+-e "REGISTRY_AUTH=htpasswd" \
+-e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" \
+-e "REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd" \
+-e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
+-e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
+registry
+$docker push our.company.registry:5000/(image)
+(no basic auth credential)
+$docker login our.company.registry:5000
+login: suraj
+password: 
+$docker push our.company.registry:5000/(image)
+(success)
+$docker logout our.company.registry:5000
+=========================
+  

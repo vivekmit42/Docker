@@ -1,1 +1,150 @@
+What is a Docker?
 
+* Docker is a containerization platform for developing, packaging, shipping, and running applications.
+* It provides the ability to run an application in an isolated environment called a container.
+* Makes deployment and development efficient.
+
+Why is a container?
+
+* A way to package an application with all the necessary dependencies and configuration.
+* It can be easily shared
+* Makes deployment and development efficient.
+
+Architecture of Docker
+
+* Docker has a client-server setup where the client sends commands to the Docker engine (daemon) to build, run, or manage containers. Containers are created from images, and these images are stored in registries for easy sharing and reuse.
+
+Main components of Docker
+
+* Docker file - set of instruction which ensure all the services, tools, command which is required in docker image 
+* Docker Images - 
+* Docker Container - 
+* Docker Registry - a docker registry is a central repository for storing and distributing docker images. like docker hub or private registory.
+* Docker hub - it is official docker repository, which is holding more than 1 lacs docker images available to public.
+* Registory Vs Repository - registory is collection of images and repository is collection of different versions of images.
+
+Workflow of Docker
+
+step 1. Create a docker file(it is text file with instruction to build an image)
+step 2. create a docker image using docker file
+step 3. create a containers using docker image.
+
+--------------------------------------------------------------------------------------------------------------------------
+
+Installing docker
+
+# zypper install docker
+#systemctl start docker.service
+#systemctl status docker.service
+
+#docker ps
+#docker -v
+
+-------------------------------------------------------------------------------------------------------------------------
+
+CREATING DOCKER FILE
+
+* create a file with name Dockerfile with following content
+
+FROM node:20                -- here you are using node with version 20
+
+WORKDIR /app01              -- here you are telling to creat a directory in your image
+
+COPY . .                    -- you are telling to copy all content from your current directory
+
+RUN npm install             -- you are installing a npm service in your image
+
+RUN npm start               -- you are starting npm service in your image
+
+EXPOSE 3000                 -- you are using 3000 port in your image
+
+CMD ["npm","start"]         -- you are running npm start command in your image's cmd
+
+then after saving this file run command
+
+#docker build .
+
+this will create a image using this file based on your requirement
+check 
+#docker image ls            -list out all images
+-----------------------------------------------------------------------------------------------------------------------
+
+Pull a image from docker hub and run that image
+#docker pull nginx
+#docker images
+#docker run -d nginx
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+* Several key components:
+1. Docker Components
+a. Docker Client - It is a command-line tool that users interact with to communicate with the Docker daemon.
+It sends commands such as docker build, docker pull, and docker run to the Docker daemon via REST API calls.
+Commands can also be sent to remote Docker daemons.
+b. Docker Daemon (dockerd)
+The Docker daemon runs on the host machine and is responsible for managing Docker objects such as images, containers, networks, and volumes.
+It listens for requests from the Docker client and performs the requested operations.
+It also communicates with other daemons to manage distributed setups.
+c. Docker Objects
+Images:
+Immutable templates for creating containers.
+Built using Dockerfiles and stored in Docker registries.
+Containers:
+Lightweight, portable runtime environments created from Docker images.
+Containers are isolated and include all necessary dependencies to run an application.
+Volumes:
+Used for persistent data storage that is shared across containers.
+Networks:
+Enable communication between containers and other parts of the Docker environment.
+d. Docker Registries
+A registry stores Docker images. Examples include Docker Hub (public registry) and private registries.
+The Docker client can push and pull images from registries.
+2. Core Architectural Components
+a. Docker Engine
+The Docker Engine is the core component that combines the Docker Daemon, REST API, and CLI (Command Line Interface).
+b. REST API
+A set of HTTP endpoints that allow communication between the Docker client and daemon.
+It provides programmatic access to Docker functionalities.
+c. Storage Drivers
+Docker uses storage drivers to manage the file system layers of containers.
+Examples include OverlayFS, AUFS, and Device Mapper.
+d. Networking Drivers
+Docker supports various networking drivers, such as:
+Bridge: Default networking driver for container-to-container communication.
+Host: Containers share the host network stack.
+Overlay: Enables communication across multiple Docker hosts in a swarm.
+None: Disables networking for containers.
+3. Container Runtime
+a. runc
+Docker uses runc, a lightweight container runtime, to spawn and run containers.
+It is based on the Open Container Initiative (OCI) specification.
+b. Containerd
+A core component that manages container lifecycle tasks such as starting, stopping, and managing container images.
+4. Docker Workflow
+Build: A Docker image is built using a Dockerfile.
+Push: The image is uploaded to a registry (e.g., Docker Hub).
+Pull: The image is downloaded to a host machine.
+Run: A container is started from the image.
+5. Orchestration (Optional)
+Docker Swarm: Native orchestration tool for managing clusters of Docker engines.
+Kubernetes: Widely used orchestration platform for managing containerized applications in distributed environments.
